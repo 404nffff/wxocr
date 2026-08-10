@@ -59,6 +59,20 @@
             margin: 20px 0;
         }
 
+        .mode-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .mode-option input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+
         input[type="file"],
         input[type="text"] {
             width: 100%;
@@ -160,6 +174,10 @@
                 <p>或拖拽图片到此区域</p>
                 <input type="text" id="urlInput" placeholder="输入图片URL地址">
             </div>
+            <label class="mode-option">
+                <input type="checkbox" id="longImageMode">
+                <span>长图分段识别</span>
+            </label>
             <button onclick="processImage()">开始识别</button>
         </div>
 
@@ -203,8 +221,7 @@
     </div>
 
     <script>
-        // 默认的API地址
-        const API_ENDPOINT = window.location.origin + '/ocr';
+        const API_BASE_URL = window.location.origin;
 
         // 初始化拖放功能
         const uploadSection = document.querySelector('.upload-section');
@@ -251,6 +268,7 @@
         async function processImage() {
             const file = document.getElementById('fileInput').files[0];
             const url = document.getElementById('urlInput').value;
+            const longImageMode = document.getElementById('longImageMode').checked;
             let base64Data = '';
 
             try {
@@ -266,8 +284,8 @@
                     return;
                 }
 
-                // 发送请求
-                const response = await fetch(API_ENDPOINT, {
+                const endpoint = longImageMode ? '/ocr/long' : '/ocr';
+                const response = await fetch(API_BASE_URL + endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
